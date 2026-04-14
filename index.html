@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Жеребьёвка команд</title>
+<title>BILMIX - Live Standings</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -12,344 +12,212 @@
     --card: #181c26;
     --border: rgba(255,255,255,0.07);
     --accent: #c9ff3b;
-    --accent2: #3b8fff;
     --text: #f0f2f5;
     --muted: #6b7280;
-    --danger: #ff4d4d;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    min-height: 100vh;
-  }
+  body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; padding-bottom: 5rem; }
+  
   header {
-    padding: 2rem 2rem 1rem;
+    padding: 2rem;
     border-bottom: 1px solid var(--border);
     display: flex;
-    align-items: flex-end;
-    gap: 1rem;
-  }
-  header h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 48px;
-    letter-spacing: 2px;
-    line-height: 1;
-    color: var(--accent);
-  }
-  header span {
-    font-size: 14px;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-  .main { padding: 1.5rem 2rem; }
-  .setup-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 14px;
-    margin-bottom: 2rem;
-  }
-  .team-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .team-card:hover { border-color: rgba(255,255,255,0.14); }
-  .team-header {
-    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border);
   }
-  .color-bar {
-    width: 4px;
-    height: 28px;
-    border-radius: 3px;
-    flex-shrink: 0;
-  }
-  .team-name-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 1px;
-    color: var(--text);
-    min-width: 0;
-  }
-  .team-name-input::placeholder { color: var(--muted); }
-  .team-body { padding: 12px 14px; }
-  .add-row {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-  .add-row input {
-    flex: 1;
+  header h1 { font-family: 'Bebas Neue'; font-size: 42px; color: var(--accent); letter-spacing: 2px; }
+
+  .admin-lock-btn {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 10px;
-    font-family: 'Barlow', sans-serif;
-    font-size: 13px;
-    color: var(--text);
-    outline: none;
-    min-width: 0;
-    transition: border-color 0.2s;
-  }
-  .add-row input:focus { border-color: var(--accent); }
-  .add-row input::placeholder { color: var(--muted); }
-  .add-row button {
-    background: var(--accent);
-    border: none;
-    border-radius: 8px;
-    width: 32px;
-    height: 32px;
-    font-size: 20px;
-    line-height: 1;
-    color: #000;
-    cursor: pointer;
-    font-weight: 600;
-    flex-shrink: 0;
-    transition: opacity 0.15s;
-  }
-  .add-row button:hover { opacity: 0.85; }
-  .player-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 5px 0;
-    border-top: 1px solid var(--border);
-    font-size: 13px;
-    color: var(--text);
-  }
-  .player-item button {
-    background: none;
-    border: none;
     color: var(--muted);
-    cursor: pointer;
-    font-size: 16px;
-    padding: 0 2px;
-    line-height: 1;
-    transition: color 0.15s;
-  }
-  .player-item button:hover { color: var(--danger); }
-  .no-players { font-size: 12px; color: var(--muted); font-style: italic; }
-  .draw-btn {
-    display: block;
-    width: 100%;
-    padding: 16px;
-    background: var(--accent);
-    border: none;
-    border-radius: 12px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 2px;
-    color: #000;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.15s;
-  }
-  .draw-btn:hover { opacity: 0.9; }
-  .draw-btn:active { transform: scale(0.99); }
-
-  /* Results */
-  #view-result { display: none; }
-  .result-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-  .result-header h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 32px;
-    letter-spacing: 2px;
-    color: var(--accent);
-  }
-  .back-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 8px;
     padding: 8px 16px;
-    color: var(--muted);
-    font-family: 'Barlow', sans-serif;
-    font-size: 14px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
+    font-size: 12px;
+    transition: 0.3s;
   }
-  .back-btn:hover { border-color: var(--text); color: var(--text); }
-  .result-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 14px;
-  }
-  .result-card {
+  .admin-lock-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+  /* Leaderboard */
+  .leaderboard {
     background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 40px;
     border: 1px solid var(--border);
+  }
+  .leaderboard h2 { font-family: 'Bebas Neue'; font-size: 32px; margin-bottom: 20px; color: #fff; }
+  
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; color: var(--muted); font-size: 12px; padding: 12px; text-transform: uppercase; }
+  td { padding: 18px 12px; border-top: 1px solid var(--border); }
+  
+  .pos { font-family: 'Bebas Neue'; font-size: 26px; width: 60px; }
+  .pos-1 { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.3); }
+  .pos-2 { color: #c0c0c0; }
+  .pos-3 { color: #cd7f32; }
+
+  .pts-display { font-weight: bold; color: var(--accent); font-size: 18px; }
+  .pts-input {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    width: 60px;
+    text-align: center;
+    display: none;
+  }
+
+  /* Member Cards */
+  .teams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .member-card {
+    background: var(--card);
     border-radius: 12px;
-    overflow: hidden;
-    animation: fadeIn 0.4s ease forwards;
-    opacity: 0;
+    padding: 20px;
+    border-left: 4px solid var(--clr);
   }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .result-card-head {
-    display: flex;
+  .member-card h3 { font-family: 'Bebas Neue'; font-size: 20px; margin-bottom: 12px; }
+  .player-list { list-style: none; font-size: 14px; }
+  .player-list li { 
+    padding: 6px 0; 
+    border-bottom: 1px solid rgba(255,255,255,0.03); 
+    display: flex; 
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border);
   }
-  .result-card-bar {
-    width: 4px;
-    height: 28px;
-    border-radius: 3px;
-    flex-shrink: 0;
-  }
-  .result-team-name {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 1px;
-    color: var(--text);
-  }
-  .result-card-body { padding: 8px 14px 12px; }
-  .result-player {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 0;
-    border-top: 1px solid var(--border);
-    font-size: 13px;
-    color: var(--text);
-  }
-  .result-player:first-child { border-top: none; }
-  .pdot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .no-p { font-size: 12px; color: var(--muted); font-style: italic; padding: 4px 0; }
+
+  .del-btn { color: #ff4d4d; cursor: pointer; display: none; margin-left: 10px; font-weight: bold; }
+  .add-form { margin-top: 15px; display: none; gap: 5px; }
+  .add-form input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 6px; border-radius: 4px; font-size: 12px; }
+  .add-form button { background: var(--accent); border: none; padding: 0 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
+  /* Admin Active State */
+  body.admin-mode .pts-input, 
+  body.admin-mode .del-btn, 
+  body.admin-mode .add-form { display: flex !important; }
+  body.admin-mode .pts-display { display: none; }
 </style>
 </head>
-<body>
+<body id="page-body">
 
 <header>
-  <h1>⚽ BILMIX </h1>
-  <span>8 comands </span>
+  <h1>⚽ BILMIX LIVE</h1>
+  <button class="admin-lock-btn" id="lock-btn" onclick="checkAdmin()">ADMIN LOGIN</button>
 </header>
 
-<div class="main">
-  <div id="view-setup">
-    <div class="setup-grid" id="setup-grid"></div>
-    <button class="draw-btn" onclick="showResult()"> РЕЗУЛЬТАТЫ </button>
-  </div>
+<div class="container">
+  <section class="leaderboard">
+    <h2>🏆 STANDINGS</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>RANK</th>
+          <th>TEAM</th>
+          <th>POINTS</th>
+        </tr>
+      </thead>
+      <tbody id="standings-body"></tbody>
+    </table>
+  </section>
 
-  <div id="view-result">
-    <div class="result-header">
-      <h2>Результаты</h2>
-      <button class="back-btn" onclick="goBack()">← BACK</button>
-    </div>
-    <div class="result-grid" id="result-grid"></div>
-  </div>
+  <h2 style="font-family: 'Bebas Neue'; font-size: 32px; margin-bottom: 20px;">👥 TEAM ROSTERS</h2>
+  <div class="teams-grid" id="teams-grid"></div>
 </div>
 
 <script>
 const COLORS = ['#c9ff3b','#3b8fff','#ff6b35','#ff3bac','#3bffe0','#ffcc3b','#a855f7','#ff4d4d'];
-const DEFAULT_NAMES = ['Команда 1','Команда 2','Команда 3','Команда 4','Команда 5','Команда 6','Команда 7','Команда 8'];
+const ADMIN_PASS = "713"; 
 
-const teams = DEFAULT_NAMES.map((name, i) => ({ name, color: COLORS[i], players: [] }));
+// --- SAVE & LOAD LOGIC ---
+const initialTeams = [
+  { id: 0, name: "ILYAS MATH AGAY", color: COLORS[0], points: 0, players: ["erzat abi", "ABZAL 9 A", "NURARYS 10 B", "ABILMANSUR 8B", "GHANI 8B", "SULTANBI 10 A", "ERMAKHAN 8B"] },
+  { id: 1, name: "ERNUR AGAY", color: COLORS[1], points: 0, players: ["nurbek abi", "AKZHIGIT", "ERNUR 10 A", "NURALY 10 A", "ELZHAN 9A", "ERBOLAT 9A", "ADIL 8 A"] },
+  { id: 2, name: "ARZU AGAY", color: COLORS[2], points: 0, players: ["ALMAT ABI", "BATYRKHAN 10 B", "ELZHAN 8A", "SHYNGYS 10 A", "BAKDAULET 9B", "ADILZHAN 9 B", "AIDMUKHAMED 9A"] },
+  { id: 3, name: "DANIYAR FOOTBALL AGAY", color: COLORS[3], points: 0, players: ["RINAT ABI", "BIBARYS 9 A", "ORAZALY 9 A", "ORYNBASAROV A 10 B", "NURALY E 8 A", "OLZHAS 10B", "BEKZAT 9 A"] },
+  { id: 4, name: "NURALY AGAY", color: COLORS[4], points: 0, players: ["BIRZHAN ABI", "MAKSAT 9 B", "ALIKHAN 8B", "BEKZAT 8 B", "ERASYL 8A", "ALISHER 10A", "BEKARYS 9A"] },
+  { id: 5, name: "ILYAS INFO AGAY", color: COLORS[5], points: 0, players: ["AIDAR ABI", "ERSULTAN 10B", "ARNUR 9 B", "ALDIYAR 9 B", "BEKBOLAT 9B", "MANSUR 9B", "ALIKHAN TALANTULY 8A"] },
+  { id: 6, name: "BEKZAT AGAY", color: COLORS[6], points: 0, players: ["NURBOLAT ABI", "ERZHAN 10 A", "ALIKHAN E 10 B", "ERALY 8B", "ALIKHAN M 8A", "BEKBOLAT 10 B", "NURMUKHAMED 8A"] },
+  { id: 7, name: "DANIYAR WALTER WHITE AG", color: COLORS[7], points: 0, players: ["ERASYL ABI", "BEKZHAN 10 B", "SULTANALI 8A", "NURSULTAN O 10 A", "ALIKHAN T 8B", "ZHOMART 8B", "ARNUR 10A"] }
+];
 
-function renderSetup() {
-  const grid = document.getElementById('setup-grid');
-  grid.innerHTML = teams.map((t, ti) => `
-    <div class="team-card">
-      <div class="team-header">
-        <div class="color-bar" style="background:${t.color}"></div>
-        <input class="team-name-input" value="${escHtml(t.name)}" placeholder="КОМАНДА ${ti+1}"
-          oninput="teams[${ti}].name=this.value" />
-      </div>
-      <div class="team-body">
-        <div class="add-row">
-          <input type="text" id="pi-${ti}" placeholder="Имя игрока..."
-            onkeydown="if(event.key==='Enter')addPlayer(${ti})" />
-          <button onclick="addPlayer(${ti})">+</button>
-        </div>
-        <div id="players-${ti}">
-          ${renderPlayers(ti)}
-        </div>
+// Load from Storage or use initial
+let teams = JSON.parse(localStorage.getItem('bilmix_teams')) || initialTeams;
+
+function saveData() {
+  localStorage.setItem('bilmix_teams', JSON.stringify(teams));
+}
+
+function checkAdmin() {
+  const pass = prompt("Enter Admin Password:");
+  if (pass === ADMIN_PASS) {
+    document.getElementById('page-body').classList.toggle('admin-mode');
+    document.getElementById('lock-btn').innerText = 
+      document.getElementById('page-body').classList.contains('admin-mode') ? "EXIT ADMIN" : "ADMIN LOGIN";
+  } else {
+    alert("Incorrect Password!");
+  }
+}
+
+function render() {
+  const sorted = [...teams].sort((a, b) => b.points - a.points);
+  
+  document.getElementById('standings-body').innerHTML = sorted.map((t, i) => `
+    <tr>
+      <td class="pos pos-${i+1}">#${i+1}</td>
+      <td style="font-weight:600; font-size:18px">${t.name}</td>
+      <td>
+        <span class="pts-display">${t.points} PTS</span>
+        <input type="number" class="pts-input" value="${t.points}" onchange="updatePts(${t.id}, this.value)">
+      </td>
+    </tr>
+  `).join('');
+
+  document.getElementById('teams-grid').innerHTML = teams.map((t, ti) => `
+    <div class="member-card" style="--clr: ${t.color}">
+      <h3>${t.name}</h3>
+      <ul class="player-list">
+        ${t.players.map((p, pi) => `
+          <li>
+            ${p} 
+            <span class="del-btn" onclick="removePlayer(${ti}, ${pi})">×</span>
+          </li>
+        `).join('')}
+      </ul>
+      <div class="add-form">
+        <input type="text" id="in-${ti}" placeholder="Add player...">
+        <button onclick="addPlayer(${ti})">+</button>
       </div>
     </div>
   `).join('');
 }
 
-function renderPlayers(ti) {
-  const t = teams[ti];
-  if (!t.players.length) return `<div class="no-players">Нет игроков</div>`;
-  return t.players.map((p, pi) => `
-    <div class="player-item">
-      <span>${escHtml(p)}</span>
-      <button onclick="removePlayer(${ti},${pi})">×</button>
-    </div>
-  `).join('');
+function updatePts(id, val) {
+  teams.find(t => t.id === id).points = parseInt(val) || 0;
+  saveData(); // Save to browser memory
+  render();
 }
 
 function addPlayer(ti) {
-  const inp = document.getElementById('pi-' + ti);
-  const name = inp.value.trim();
-  if (!name) return;
-  teams[ti].players.push(name);
-  inp.value = '';
-  document.getElementById('players-' + ti).innerHTML = renderPlayers(ti);
-  inp.focus();
+  const val = document.getElementById('in-' + ti).value;
+  if (val) {
+    teams[ti].players.push(val);
+    document.getElementById('in-' + ti).value = '';
+    saveData(); // Save to browser memory
+    render();
+  }
 }
 
 function removePlayer(ti, pi) {
   teams[ti].players.splice(pi, 1);
-  document.getElementById('players-' + ti).innerHTML = renderPlayers(ti);
+  saveData(); // Save to browser memory
+  render();
 }
 
-function showResult() {
-  document.getElementById('view-setup').style.display = 'none';
-  document.getElementById('view-result').style.display = 'block';
-
-  const grid = document.getElementById('result-grid');
-  grid.innerHTML = teams.map((t, i) => `
-    <div class="result-card" style="animation-delay:${i * 0.07}s">
-      <div class="result-card-head">
-        <div class="result-card-bar" style="background:${t.color}"></div>
-        <div class="result-team-name">${escHtml(t.name || 'Команда ' + (i+1))}</div>
-      </div>
-      <div class="result-card-body">
-        ${t.players.length
-          ? t.players.map(p => `
-              <div class="result-player">
-                <div class="pdot" style="background:${t.color}"></div>
-                ${escHtml(p)}
-              </div>`).join('')
-          : `<div class="no-p">Нет игроков</div>`}
-      </div>
-    </div>
-  `).join('');
-}
-
-function goBack() {
-  document.getElementById('view-result').style.display = 'none';
-  document.getElementById('view-setup').style.display = 'block';
-  renderSetup();
-}
-
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-renderSetup();
+render();
 </script>
 </body>
 </html>
