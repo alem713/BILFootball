@@ -2,44 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Tournament Central</title>
+    <title>Student Tournament</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
     <header>
-        <h1>🏆 Tournament Hub</h1>
-        <p>Live Updates & Standings</p>
+        <h1>🏆 BILMIX </h1>
     </header>
 
-    <main>
-        <section id="news-section">
-            <h2>Latest Match News</h2>
-            <div id="news-container">
-                <p>Loading news...</p>
-            </div>
+    <div class="container">
+        <section>
+            <h2>Match News</h2>
+            <div id="news-list"></div>
         </section>
 
-        <section id="leaderboard-section">
+        <section>
             <h2>Leaderboard</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Team</th>
-                        <th>W</th>
-                        <th>D</th>
-                        <th>L</th>
-                        <th>Pts</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard-body">
-                    </tbody>
-            </table>
+            <table id="leaderboard">
+                <tr>
+                    <th>Team</th>
+                    <th>Wins</th>
+                    <th>Points</th>
+                </tr>
+                </table>
         </section>
-    </main>
+    </div>
 
     <script src="script.js"></script>
 </body>
