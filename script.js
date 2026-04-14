@@ -1,6 +1,6 @@
 // REPLACE THESE with your actual Supabase details
 const SUPABASE_URL = 'https://nnqulzbcqsvjvkjpgitx.supabase.co';
-const SUPABASE_KEY = 'sb_secret_AXjAC8ugUtx2vzUcqb7tFw_nKZmiFiC';
+const SUPABASE_KEY = 'sb_publishable_ChmcMuJbutCrEd0XTMMN8w_TRKsyl5x';
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function fetchData() {
