@@ -1,46 +1,64 @@
-// REPLACE THESE with your actual Supabase details
-const SUPABASE_URL = 'https://nnqulzbcqsvjvkjpgitx.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_ChmcMuJbutCrEd0XTMMN8w_TRKsyl5x';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// EDIT THIS DATA TO UPDATE YOUR SITE
+const newsData = [
+    { title: "Tournament Live!", info: "Matches start this Friday. Be on time!" },
+    { title: "Rules Update", info: "Each half is 15 minutes. No offsides." }
+];
 
-async function fetchData() {
-    // 1. Fetch News
-    const { data: news, newsError } = await supabase
-        .from('news')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (news) {
-        const container = document.getElementById('news-container');
-        container.innerHTML = news.map(item => `
-            <div class="news-card">
-                <h3>${item.title}</h3>
-                <p>${item.content}</p>
-                <small>${new Date(item.created_at).toLocaleDateString()}</small>
-            </div>
-        `).join('');
+const teamData = [
+    { 
+        name: "ILYAS MATH AGAY", 
+        wins: 3, 
+        members: ["Erzat Abi", "Abzal 9A", "Nurarys 10B", "Abilmansur 8B", "Ghani 8B", "Sultanbi 10A", "Ermakhan 8B"] 
+    },
+    { 
+        name: "ERNUR AGAY", 
+        wins: 1, 
+        members: ["Nurbek Abi", "Akzhigit", "Ernur 10A", "Nuraly 10A", "Elzhan 9A", "Erbolat 9A", "Adil 8A"] 
+    },
+    { 
+        name: "ARZU AGAY", 
+        wins: 2, 
+        members: ["Almat Abi", "Batyrkhan 10B", "Elzhan 8A", "Shyngys 10A", "Bakdaulet 9B", "Adilzhan 9B", "Aidmukhamed 9A"] 
+    },
+    { 
+        name: "DANIYAR FOOTBALL AGAY", 
+        wins: 5, 
+        members: ["Rinat Abi", "Bibarys 9A", "Orazaly 9A", "Orynbasarov 10B", "Nuraly E 8A", "Olzhas 10B", "Bekzat 9A"] 
+    },
+    { 
+        name: "NURALY AGAY", 
+        wins: 0, 
+        members: ["Birzhan Abi", "Maksat 9B", "Alikhan 8B", "Bekzat 8B", "Erasyl 8A", "Alisher 10A", "Bekarys 9A"] 
+    },
+    { 
+        name: "ILYAS INFO AGAY", 
+        wins: 0, 
+        members: ["Aidar Abi", "Ersultan 10B", "Arnur 9B", "Aldiyar 9B", "Bekbolat 9B", "Mansur 9B", "Alikhan Talantuly 8A"] 
     }
+];
 
-    // 2. Fetch Leaderboard
-    const { data: teams, teamError } = await supabase
-        .from('teams')
-        .select('*')
-        .order('points', { ascending: false });
+function init() {
+    // Fill News
+    const newsList = document.getElementById('news-list');
+    newsData.forEach(item => {
+        newsList.innerHTML += `<div class="news-item"><strong>${item.title}</strong><p>${item.info}</p></div>`;
+    });
 
-    if (teams) {
-        const tableBody = document.getElementById('leaderboard-body');
-        tableBody.innerHTML = teams.map((team, index) => `
-            <tr>
-                <td>${index + 1}</td>
-                <td>**${team.name}**</td>
-                <td>${team.wins}</td>
-                <td>${team.draws}</td>
-                <td>${team.losses}</td>
-                <td>${(team.wins * 3) + (team.draws * 1)}</td>
-            </tr>
-        `).join('');
-    }
+    // Fill Leaderboard (Highest Wins First)
+    const tableBody = document.getElementById('leaderboard-body');
+    [...teamData].sort((a,b) => b.wins - a.wins).forEach(team => {
+        tableBody.innerHTML += `<tr><td>${team.name}</td><td>${team.wins}</td><td>${team.wins * 3}</td></tr>`;
+    });
+
+    // Fill Team Grid
+    const teamGrid = document.getElementById('teams-grid');
+    teamData.forEach(team => {
+        teamGrid.innerHTML += `
+            <div class="team-card">
+                <h3>${team.name}</h3>
+                <div class="member-list">${team.members.join('<br>')}</div>
+            </div>`;
+    });
 }
 
-// Run the function when the page loads
-fetchData();
+document.addEventListener('DOMContentLoaded', init);
