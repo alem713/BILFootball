@@ -3,102 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BILMIX - Live Standings</title>
+<title>BILMIX LIVE - Online Standings</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0c10;
-    --surface: #12151c;
-    --card: #181c26;
-    --border: rgba(255,255,255,0.07);
-    --accent: #c9ff3b;
-    --text: #f0f2f5;
-    --muted: #6b7280;
+    --bg: #0a0c10; --surface: #12151c; --card: #181c26; --border: rgba(255,255,255,0.07);
+    --accent: #c9ff3b; --text: #f0f2f5; --muted: #6b7280;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; padding-bottom: 5rem; }
   
-  header {
-    padding: 2rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+  header { padding: 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
   header h1 { font-family: 'Bebas Neue'; font-size: 42px; color: var(--accent); letter-spacing: 2px; }
 
-  .admin-lock-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: 0.3s;
-  }
-  .admin-lock-btn:hover { color: var(--accent); border-color: var(--accent); }
-
+  .admin-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; }
   .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
   /* Leaderboard */
-  .leaderboard {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 40px;
-    border: 1px solid var(--border);
-  }
-  .leaderboard h2 { font-family: 'Bebas Neue'; font-size: 32px; margin-bottom: 20px; color: #fff; }
-  
+  .leaderboard { background: var(--card); border-radius: 16px; padding: 24px; margin-bottom: 40px; border: 1px solid var(--border); }
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; color: var(--muted); font-size: 12px; padding: 12px; text-transform: uppercase; }
   td { padding: 18px 12px; border-top: 1px solid var(--border); }
+  .pos { font-family: 'Bebas Neue'; font-size: 26px; width: 60px; color: var(--accent); }
   
-  .pos { font-family: 'Bebas Neue'; font-size: 26px; width: 60px; }
-  .pos-1 { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.3); }
-  .pos-2 { color: #c0c0c0; }
-  .pos-3 { color: #cd7f32; }
+  .pts-input { background: var(--bg); border: 1px solid var(--accent); color: #fff; width: 60px; text-align: center; display: none; padding: 4px; border-radius: 4px; }
 
-  .pts-display { font-weight: bold; color: var(--accent); font-size: 18px; }
-  .pts-input {
-    background: var(--bg);
-    border: 1px solid var(--accent);
-    color: #fff;
-    padding: 5px;
-    border-radius: 4px;
-    width: 60px;
-    text-align: center;
-    display: none;
-  }
-
-  /* Member Cards */
+  /* Team Cards */
   .teams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-  .member-card {
-    background: var(--card);
-    border-radius: 12px;
-    padding: 20px;
-    border-left: 4px solid var(--clr);
-  }
-  .member-card h3 { font-family: 'Bebas Neue'; font-size: 20px; margin-bottom: 12px; }
-  .player-list { list-style: none; font-size: 14px; }
-  .player-list li { 
-    padding: 6px 0; 
-    border-bottom: 1px solid rgba(255,255,255,0.03); 
-    display: flex; 
-    justify-content: space-between;
-    align-items: center;
-  }
+  .member-card { background: var(--card); border-radius: 12px; padding: 20px; border-left: 4px solid var(--clr); }
+  .player-list { list-style: none; font-size: 14px; margin-top: 10px; color: var(--text); }
+  .player-list li { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; }
 
-  .del-btn { color: #ff4d4d; cursor: pointer; display: none; margin-left: 10px; font-weight: bold; }
-  .add-form { margin-top: 15px; display: none; gap: 5px; }
-  .add-form input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 6px; border-radius: 4px; font-size: 12px; }
-  .add-form button { background: var(--accent); border: none; padding: 0 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-  /* Admin Active State */
-  body.admin-mode .pts-input, 
-  body.admin-mode .del-btn, 
-  body.admin-mode .add-form { display: flex !important; }
+  .del-btn, .add-form { display: none; }
+  body.admin-mode .pts-input, body.admin-mode .del-btn, body.admin-mode .add-form { display: flex !important; }
   body.admin-mode .pts-display { display: none; }
 </style>
 </head>
@@ -106,118 +43,108 @@
 
 <header>
   <h1>⚽ BILMIX LIVE</h1>
-  <button class="admin-lock-btn" id="lock-btn" onclick="checkAdmin()">ADMIN LOGIN</button>
+  <button class="admin-btn" onclick="checkAdmin()">ADMIN LOGIN</button>
 </header>
 
 <div class="container">
   <section class="leaderboard">
-    <h2>🏆 STANDINGS</h2>
+    <h2>🏆 ТУРНИРНАЯ ТАБЛИЦА</h2>
     <table>
-      <thead>
-        <tr>
-          <th>RANK</th>
-          <th>TEAM</th>
-          <th>POINTS</th>
-        </tr>
-      </thead>
       <tbody id="standings-body"></tbody>
     </table>
   </section>
 
-  <h2 style="font-family: 'Bebas Neue'; font-size: 32px; margin-bottom: 20px;">👥 TEAM ROSTERS</h2>
+  <h2 style="font-family: 'Bebas Neue'; margin-bottom: 20px;">👥 СОСТАВЫ</h2>
   <div class="teams-grid" id="teams-grid"></div>
 </div>
 
 <script>
-const COLORS = ['#c9ff3b','#3b8fff','#ff6b35','#ff3bac','#3bffe0','#ffcc3b','#a855f7','#ff4d4d'];
+// --- CONFIG ---
+const SUPABASE_URL = 'nnqulzbcqsvjvkjpgitx'; 
+const SUPABASE_KEY = 'sb_publishable_ChmcMuJbutCrEd0XTMMN8w_TRKsyl5x';
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const ADMIN_PASS = "713"; 
 
-// --- SAVE & LOAD LOGIC ---
-const initialTeams = [
-  { id: 0, name: "ILYAS MATH AGAY", color: COLORS[0], points: 0, players: ["ERZAT ABI", "ABZAL 9 A", "NURARYS 10 B", "ABILMANSUR 8B", "GHANI 8B", "SULTANBI 10 A", "ERMAKHAN 8B"] },
-  { id: 1, name: "ERNUR AGAY", color: COLORS[1], points: 0, players: ["NURBEK ABI", "AKZHIGIT 9 B", "ERNUR 10 A", "NURALY 10 A", "ELZHAN 9A", "ERBOLAT 9A", "ADIL 8 A"] },
-  { id: 2, name: "ARZU AGAY", color: COLORS[2], points: 0, players: ["ALMAT ABI", "BATYRKHAN 10 B", "ELZHAN 8A", "SHYNGYS 10 A", "BAKDAULET 9B", "ADILZHAN 9 B", "AIDMUKHAMED 9A"] },
-  { id: 3, name: "DANIYAR FOOTBALL AGAY", color: COLORS[3], points: 0, players: ["RINAT ABI", "BEIBARYS 9 A", "ORAZALI 9 A", "ORYNBASAROV A 10 B", "NURALY E 8 A", "OLZHAS 10B", "BEKZAT 9 A"] },
-  { id: 4, name: "NURALY AGAY", color: COLORS[4], points: 0, players: ["BIRZHAN ABI", "MAKSAT 9 B", "ALIKHAN 8B", "BEKZAT 8 B", "ERASYL 8A", "ALISHER 10A", "BEKARYS 9A"] },
-  { id: 5, name: "ILYAS INFO AGAY", color: COLORS[5], points: 0, players: ["AIDAR ABI", "ERSULTAN 10B", "ARNUR 9 B", "ALDIYAR 9 B", "BEKBOLAT 9B", "MANSUR 9B", "ALIKHAN TALANTULY 8A"] },
-  { id: 6, name: "BEKZAT AGAY", color: COLORS[6], points: 0, players: ["NURBOLAT ABI", "ERZHAN 10 A", "ALIKHAN E 10 B", "ERALY 8B", "ALIKHAN M 8A", "BEKBOLAT 10 B", "NURMUKHAMED 8A"] },
-  { id: 7, name: "DANIYAR WALTER WHITE AG", color: COLORS[7], points: 0, players: ["ERASYL ABI", "BEKZHAN 10 B", "SULTANALI 8A", "NURSULTAN O 10 A", "ALIKHAN T 8B", "ZHOMART 8B", "ARNUR 10A"] }
-];
+let teams = [];
 
-// Load from Storage or use initial
-let teams = JSON.parse(localStorage.getItem('bilmix_teams')) || initialTeams;
+// --- DATABASE LOGIC ---
+async function fetchTeams() {
+    const { data } = await _supabase.from('teams').select('*').order('id', { ascending: true });
+    if (data) {
+        teams = data;
+        render();
+    }
+}
 
-function saveData() {
-  localStorage.setItem('bilmix_teams', JSON.stringify(teams));
+async function updatePoints(id, val) {
+    const pts = parseInt(val) || 0;
+    await _supabase.from('teams').update({ points: pts }).eq('id', id);
+    fetchTeams(); // Everyone gets the update
+}
+
+async function savePlayers(id, playersArr) {
+    await _supabase.from('teams').update({ players: playersArr.join(',') }).eq('id', id);
+    fetchTeams();
+}
+
+// --- UI LOGIC ---
+function render() {
+    const sorted = [...teams].sort((a, b) => b.points - a.points);
+    const COLORS = ['#c9ff3b','#3b8fff','#ff6b35','#ff3bac','#3bffe0','#ffcc3b','#a855f7','#ff4d4d'];
+
+    document.getElementById('standings-body').innerHTML = sorted.map((t, i) => `
+        <tr>
+            <td class="pos">#${i+1}</td>
+            <td style="font-weight:600; font-size:18px">${t.name}</td>
+            <td>
+                <span class="pts-display" style="font-weight:bold; color:var(--accent)">${t.points} PTS</span>
+                <input type="number" class="pts-input" value="${t.points}" onchange="updatePoints(${t.id}, this.value)">
+            </td>
+        </tr>
+    `).join('');
+
+    document.getElementById('teams-grid').innerHTML = teams.map((t, ti) => {
+        const pList = t.players ? t.players.split(',') : [];
+        return `
+        <div class="member-card" style="--clr: ${COLORS[ti % 8]}">
+            <h3 style="font-family:'Bebas Neue'; color:var(--accent)">${t.name}</h3>
+            <ul class="player-list">
+                ${pList.map((p, pi) => `<li>${p} <span class="del-btn" style="color:red; cursor:pointer" onclick="removePlayer(${t.id}, ${pi})">×</span></li>`).join('')}
+            </ul>
+            <div class="add-form" style="margin-top:10px; gap:5px">
+                <input type="text" id="in-${t.id}" style="flex:1; background:#000; border:1px solid var(--border); color:#fff; padding:4px" placeholder="Имя...">
+                <button onclick="addPlayer(${t.id})" style="background:var(--accent); border:none; padding:0 10px; cursor:pointer">+</button>
+            </div>
+        </div>`;
+    }).join('');
 }
 
 function checkAdmin() {
-  const pass = prompt("Enter Admin Password:");
-  if (pass === ADMIN_PASS) {
-    document.getElementById('page-body').classList.toggle('admin-mode');
-    document.getElementById('lock-btn').innerText = 
-      document.getElementById('page-body').classList.contains('admin-mode') ? "EXIT ADMIN" : "ADMIN LOGIN";
-  } else {
-    alert("Incorrect Password!");
-  }
+    if (prompt("Пароль:") === ADMIN_PASS) {
+        document.getElementById('page-body').classList.toggle('admin-mode');
+    }
 }
 
-function render() {
-  const sorted = [...teams].sort((a, b) => b.points - a.points);
-  
-  document.getElementById('standings-body').innerHTML = sorted.map((t, i) => `
-    <tr>
-      <td class="pos pos-${i+1}">#${i+1}</td>
-      <td style="font-weight:600; font-size:18px">${t.name}</td>
-      <td>
-        <span class="pts-display">${t.points} PTS</span>
-        <input type="number" class="pts-input" value="${t.points}" onchange="updatePts(${t.id}, this.value)">
-      </td>
-    </tr>
-  `).join('');
-
-  document.getElementById('teams-grid').innerHTML = teams.map((t, ti) => `
-    <div class="member-card" style="--clr: ${t.color}">
-      <h3>${t.name}</h3>
-      <ul class="player-list">
-        ${t.players.map((p, pi) => `
-          <li>
-            ${p} 
-            <span class="del-btn" onclick="removePlayer(${ti}, ${pi})">×</span>
-          </li>
-        `).join('')}
-      </ul>
-      <div class="add-form">
-        <input type="text" id="in-${ti}" placeholder="Add player...">
-        <button onclick="addPlayer(${ti})">+</button>
-      </div>
-    </div>
-  `).join('');
+async function addPlayer(id) {
+    const inp = document.getElementById('in-' + id);
+    const team = teams.find(t => t.id === id);
+    let pList = team.players ? team.players.split(',') : [];
+    if(inp.value.trim()) {
+        pList.push(inp.value.trim());
+        await savePlayers(id, pList);
+    }
 }
 
-function updatePts(id, val) {
-  teams.find(t => t.id === id).points = parseInt(val) || 0;
-  saveData(); // Save to browser memory
-  render();
+async function removePlayer(id, pi) {
+    const team = teams.find(t => t.id === id);
+    let pList = team.players.split(',');
+    pList.splice(pi, 1);
+    await savePlayers(id, pList);
 }
 
-function addPlayer(ti) {
-  const val = document.getElementById('in-' + ti).value;
-  if (val) {
-    teams[ti].players.push(val);
-    document.getElementById('in-' + ti).value = '';
-    saveData(); // Save to browser memory
-    render();
-  }
-}
-
-function removePlayer(ti, pi) {
-  teams[ti].players.splice(pi, 1);
-  saveData(); // Save to browser memory
-  render();
-}
-
-render();
+// Initial Load and Auto-Refresh (Live)
+fetchTeams();
+setInterval(fetchTeams, 5000); // Check for updates every 5 seconds
 </script>
 </body>
 </html>
