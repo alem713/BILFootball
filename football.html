@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Жеребьёвка команд</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #12151c;
+    --card: #181c26;
+    --border: rgba(255,255,255,0.07);
+    --accent: #c9ff3b;
+    --accent2: #3b8fff;
+    --text: #f0f2f5;
+    --muted: #6b7280;
+    --danger: #ff4d4d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+  }
+  header {
+    padding: 2rem 2rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+  }
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--accent);
+  }
+  header span {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .main { padding: 1.5rem 2rem; }
+  .setup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 2rem;
+  }
+  .team-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .team-card:hover { border-color: rgba(255,255,255,0.14); }
+  .team-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .color-bar {
+    width: 4px;
+    height: 28px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .team-name-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: var(--text);
+    min-width: 0;
+  }
+  .team-name-input::placeholder { color: var(--muted); }
+  .team-body { padding: 12px 14px; }
+  .add-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .add-row input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    min-width: 0;
+    transition: border-color 0.2s;
+  }
+  .add-row input:focus { border-color: var(--accent); }
+  .add-row input::placeholder { color: var(--muted); }
+  .add-row button {
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    line-height: 1;
+    color: #000;
+    cursor: pointer;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+  }
+  .add-row button:hover { opacity: 0.85; }
+  .player-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text);
+  }
+  .player-item button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 2px;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .player-item button:hover { color: var(--danger); }
+  .no-players { font-size: 12px; color: var(--muted); font-style: italic; }
+  .draw-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: #000;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .draw-btn:hover { opacity: 0.9; }
+  .draw-btn:active { transform: scale(0.99); }
+
+  /* Results */
+  #view-result { display: none; }
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .result-header h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+  .back-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: var(--muted);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .back-btn:hover { border-color: var(--text); color: var(--text); }
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    animation: fadeIn 0.4s ease forwards;
+    opacity: 0;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .result-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-card-bar {
+    width: 4px;
+    height: 28px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .result-team-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+  .result-card-body { padding: 8px 14px 12px; }
+  .result-player {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text);
+  }
+  .result-player:first-child { border-top: none; }
+  .pdot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .no-p { font-size: 12px; color: var(--muted); font-style: italic; padding: 4px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚽ Жеребьёвка</h1>
+  <span>8 команд · введи названия и игроков</span>
+</header>
+
+<div class="main">
+  <div id="view-setup">
+    <div class="setup-grid" id="setup-grid"></div>
+    <button class="draw-btn" onclick="showResult()">ПОКАЗАТЬ РЕЗУЛЬТАТ</button>
+  </div>
+
+  <div id="view-result">
+    <div class="result-header">
+      <h2>Результаты</h2>
+      <button class="back-btn" onclick="goBack()">← Назад</button>
+    </div>
+    <div class="result-grid" id="result-grid"></div>
+  </div>
+</div>
+
+<script>
+const COLORS = ['#c9ff3b','#3b8fff','#ff6b35','#ff3bac','#3bffe0','#ffcc3b','#a855f7','#ff4d4d'];
+const DEFAULT_NAMES = ['Команда 1','Команда 2','Команда 3','Команда 4','Команда 5','Команда 6','Команда 7','Команда 8'];
+
+const teams = DEFAULT_NAMES.map((name, i) => ({ name, color: COLORS[i], players: [] }));
+
+function renderSetup() {
+  const grid = document.getElementById('setup-grid');
+  grid.innerHTML = teams.map((t, ti) => `
+    <div class="team-card">
+      <div class="team-header">
+        <div class="color-bar" style="background:${t.color}"></div>
+        <input class="team-name-input" value="${escHtml(t.name)}" placeholder="КОМАНДА ${ti+1}"
+          oninput="teams[${ti}].name=this.value" />
+      </div>
+      <div class="team-body">
+        <div class="add-row">
+          <input type="text" id="pi-${ti}" placeholder="Имя игрока..."
+            onkeydown="if(event.key==='Enter')addPlayer(${ti})" />
+          <button onclick="addPlayer(${ti})">+</button>
+        </div>
+        <div id="players-${ti}">
+          ${renderPlayers(ti)}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderPlayers(ti) {
+  const t = teams[ti];
+  if (!t.players.length) return `<div class="no-players">Нет игроков</div>`;
+  return t.players.map((p, pi) => `
+    <div class="player-item">
+      <span>${escHtml(p)}</span>
+      <button onclick="removePlayer(${ti},${pi})">×</button>
+    </div>
+  `).join('');
+}
+
+function addPlayer(ti) {
+  const inp = document.getElementById('pi-' + ti);
+  const name = inp.value.trim();
+  if (!name) return;
+  teams[ti].players.push(name);
+  inp.value = '';
+  document.getElementById('players-' + ti).innerHTML = renderPlayers(ti);
+  inp.focus();
+}
+
+function removePlayer(ti, pi) {
+  teams[ti].players.splice(pi, 1);
+  document.getElementById('players-' + ti).innerHTML = renderPlayers(ti);
+}
+
+function showResult() {
+  document.getElementById('view-setup').style.display = 'none';
+  document.getElementById('view-result').style.display = 'block';
+
+  const grid = document.getElementById('result-grid');
+  grid.innerHTML = teams.map((t, i) => `
+    <div class="result-card" style="animation-delay:${i * 0.07}s">
+      <div class="result-card-head">
+        <div class="result-card-bar" style="background:${t.color}"></div>
+        <div class="result-team-name">${escHtml(t.name || 'Команда ' + (i+1))}</div>
+      </div>
+      <div class="result-card-body">
+        ${t.players.length
+          ? t.players.map(p => `
+              <div class="result-player">
+                <div class="pdot" style="background:${t.color}"></div>
+                ${escHtml(p)}
+              </div>`).join('')
+          : `<div class="no-p">Нет игроков</div>`}
+      </div>
+    </div>
+  `).join('');
+}
+
+function goBack() {
+  document.getElementById('view-result').style.display = 'none';
+  document.getElementById('view-setup').style.display = 'block';
+  renderSetup();
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+renderSetup();
+</script>
+</body>
+</html>
