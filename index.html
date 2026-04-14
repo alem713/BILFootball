@@ -13,27 +13,19 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; padding-bottom: 5rem; }
-  
   header { padding: 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
   header h1 { font-family: 'Bebas Neue'; font-size: 42px; color: var(--accent); letter-spacing: 2px; }
-
   .admin-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; }
   .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-
-  /* Leaderboard */
   .leaderboard { background: var(--card); border-radius: 16px; padding: 24px; margin-bottom: 40px; border: 1px solid var(--border); }
   table { width: 100%; border-collapse: collapse; }
   td { padding: 18px 12px; border-top: 1px solid var(--border); }
   .pos { font-family: 'Bebas Neue'; font-size: 26px; width: 60px; color: var(--accent); }
-  
   .pts-input { background: var(--bg); border: 1px solid var(--accent); color: #fff; width: 60px; text-align: center; display: none; padding: 4px; border-radius: 4px; }
-
-  /* Team Cards */
   .teams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
   .member-card { background: var(--card); border-radius: 12px; padding: 20px; border-left: 4px solid var(--clr); }
   .player-list { list-style: none; font-size: 14px; margin-top: 10px; color: var(--text); }
   .player-list li { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; }
-
   .del-btn, .add-form { display: none; }
   body.admin-mode .pts-input, body.admin-mode .del-btn, body.admin-mode .add-form { display: flex !important; }
   body.admin-mode .pts-display { display: none; }
@@ -59,9 +51,9 @@
 </div>
 
 <script>
-// --- CONFIG ---
+// --- CONFIG (ENTER YOUR ANON KEY STARTING WITH eyJ...) ---
 const SUPABASE_URL = 'https://nnqulzbcqsvjvkjpgitx.supabase.co'; 
-const SUPABASE_KEY = 'sb_publishable_ChmcMuJbutCrEd0XTMMN8w_TRKsyl5x';
+const SUPABASE_KEY = 'sb_secret_7ettIb6hiN7Xt1gARVufuA_4Xm1Ys0v'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const ADMIN_PASS = "713"; 
 
@@ -69,21 +61,24 @@ let teams = [];
 
 // --- DATABASE LOGIC ---
 async function fetchTeams() {
-    const { data } = await _supabase.from('teams').select('*').order('id', { ascending: true });
+    // Changed 'teams' to 'BILMIX' to match your dashboard exactly
+    const { data, error } = await _supabase.from('BILMIX').select('*').order('id', { ascending: true });
     if (data) {
         teams = data;
         render();
+    } else {
+        console.error("Connection Error:", error);
     }
 }
 
 async function updatePoints(id, val) {
     const pts = parseInt(val) || 0;
-    await _supabase.from('teams').update({ points: pts }).eq('id', id);
-    fetchTeams(); // Everyone gets the update
+    await _supabase.from('BILMIX').update({ points: pts }).eq('id', id);
+    fetchTeams(); 
 }
 
 async function savePlayers(id, playersArr) {
-    await _supabase.from('teams').update({ players: playersArr.join(',') }).eq('id', id);
+    await _supabase.from('BILMIX').update({ players: playersArr.join(',') }).eq('id', id);
     fetchTeams();
 }
 
@@ -144,7 +139,7 @@ async function removePlayer(id, pi) {
 
 // Initial Load and Auto-Refresh (Live)
 fetchTeams();
-setInterval(fetchTeams, 5000); // Check for updates every 5 seconds
+setInterval(fetchTeams, 5000); 
 </script>
 </body>
 </html>
