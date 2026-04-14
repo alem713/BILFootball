@@ -43,10 +43,18 @@ const teamData = [
     }
 ];
 
-// Fill Leaderboard (Highest Points First)
+function init() {
+    // 1. Fill News
+    const newsList = document.getElementById('news-list');
+    newsList.innerHTML = ''; // Clears the list first
+    newsData.forEach(item => {
+        newsList.innerHTML += `<div class="news-item"><strong>${item.title}</strong><p>${item.info}</p></div>`;
+    });
+
+    // 2. Fill Leaderboard
     const tableBody = document.getElementById('leaderboard-body');
-    
-    // This sorts by the total points calculation
+    tableBody.innerHTML = ''; // Clears the table first
+
     const sortedTeams = [...teamData].sort((a, b) => {
         const pointsA = (a.wins * 3) + (a.draws || 0);
         const pointsB = (b.wins * 3) + (b.draws || 0);
@@ -59,7 +67,22 @@ const teamData = [
             <tr>
                 <td>${team.name}</td>
                 <td>${team.wins}</td>
-                <td>${team.draws || 0}</td> <td>${totalPoints}</td>
+                <td>${team.draws || 0}</td> 
+                <td>${totalPoints}</td>
             </tr>`;
     });
+
+    // 3. Fill Team Rosters
+    const teamGrid = document.getElementById('teams-grid');
+    teamGrid.innerHTML = ''; // Clears the grid first
+    teamData.forEach(team => {
+        teamGrid.innerHTML += `
+            <div class="team-card">
+                <h3>${team.name}</h3>
+                <div class="member-list">${team.members.join('<br>')}</div>
+            </div>`;
+    });
+}
+
+// This makes the whole thing run!
 document.addEventListener('DOMContentLoaded', init);
