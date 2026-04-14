@@ -1,145 +1,46 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BILMIX LIVE - Online Standings</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0c10; --surface: #12151c; --card: #181c26; --border: rgba(255,255,255,0.07);
-    --accent: #c9ff3b; --text: #f0f2f5; --muted: #6b7280;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; padding-bottom: 5rem; }
-  header { padding: 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-  header h1 { font-family: 'Bebas Neue'; font-size: 42px; color: var(--accent); letter-spacing: 2px; }
-  .admin-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-  .leaderboard { background: var(--card); border-radius: 16px; padding: 24px; margin-bottom: 40px; border: 1px solid var(--border); }
-  table { width: 100%; border-collapse: collapse; }
-  td { padding: 18px 12px; border-top: 1px solid var(--border); }
-  .pos { font-family: 'Bebas Neue'; font-size: 26px; width: 60px; color: var(--accent); }
-  .pts-input { background: var(--bg); border: 1px solid var(--accent); color: #fff; width: 60px; text-align: center; display: none; padding: 4px; border-radius: 4px; }
-  .teams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-  .member-card { background: var(--card); border-radius: 12px; padding: 20px; border-left: 4px solid var(--clr); }
-  .player-list { list-style: none; font-size: 14px; margin-top: 10px; color: var(--text); }
-  .player-list li { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; }
-  .del-btn, .add-form { display: none; }
-  body.admin-mode .pts-input, body.admin-mode .del-btn, body.admin-mode .add-form { display: flex !important; }
-  body.admin-mode .pts-display { display: none; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Tournament Central</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body id="page-body">
+<body>
 
-<header>
-  <h1>⚽ BILMIX LIVE</h1>
-  <button class="admin-btn" onclick="checkAdmin()">ADMIN LOGIN</button>
-</header>
+    <header>
+        <h1>🏆 Tournament Hub</h1>
+        <p>Live Updates & Standings</p>
+    </header>
 
-<div class="container">
-  <section class="leaderboard">
-    <h2>🏆 ТУРНИРНАЯ ТАБЛИЦА</h2>
-    <table>
-      <tbody id="standings-body"></tbody>
-    </table>
-  </section>
-
-  <h2 style="font-family: 'Bebas Neue'; margin-bottom: 20px;">👥 СОСТАВЫ</h2>
-  <div class="teams-grid" id="teams-grid"></div>
-</div>
-
-<script>
-// --- CONFIG (ENTER YOUR ANON KEY STARTING WITH eyJ...) ---
-const SUPABASE_URL = 'https://nnqulzbcqsvjvkjpgitx.supabase.co'; 
-const SUPABASE_KEY = 'sb_secret_7ettIb6hiN7Xt1gARVufuA_4Xm1Ys0v'; 
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const ADMIN_PASS = "713"; 
-
-let teams = [];
-
-// --- DATABASE LOGIC ---
-async function fetchTeams() {
-    // Changed 'teams' to 'BILMIX' to match your dashboard exactly
-    const { data, error } = await _supabase.from('BILMIX').select('*').order('id', { ascending: true });
-    if (data) {
-        teams = data;
-        render();
-    } else {
-        console.error("Connection Error:", error);
-    }
-}
-
-async function updatePoints(id, val) {
-    const pts = parseInt(val) || 0;
-    await _supabase.from('BILMIX').update({ points: pts }).eq('id', id);
-    fetchTeams(); 
-}
-
-async function savePlayers(id, playersArr) {
-    await _supabase.from('BILMIX').update({ players: playersArr.join(',') }).eq('id', id);
-    fetchTeams();
-}
-
-// --- UI LOGIC ---
-function render() {
-    const sorted = [...teams].sort((a, b) => b.points - a.points);
-    const COLORS = ['#c9ff3b','#3b8fff','#ff6b35','#ff3bac','#3bffe0','#ffcc3b','#a855f7','#ff4d4d'];
-
-    document.getElementById('standings-body').innerHTML = sorted.map((t, i) => `
-        <tr>
-            <td class="pos">#${i+1}</td>
-            <td style="font-weight:600; font-size:18px">${t.name}</td>
-            <td>
-                <span class="pts-display" style="font-weight:bold; color:var(--accent)">${t.points} PTS</span>
-                <input type="number" class="pts-input" value="${t.points}" onchange="updatePoints(${t.id}, this.value)">
-            </td>
-        </tr>
-    `).join('');
-
-    document.getElementById('teams-grid').innerHTML = teams.map((t, ti) => {
-        const pList = t.players ? t.players.split(',') : [];
-        return `
-        <div class="member-card" style="--clr: ${COLORS[ti % 8]}">
-            <h3 style="font-family:'Bebas Neue'; color:var(--accent)">${t.name}</h3>
-            <ul class="player-list">
-                ${pList.map((p, pi) => `<li>${p} <span class="del-btn" style="color:red; cursor:pointer" onclick="removePlayer(${t.id}, ${pi})">×</span></li>`).join('')}
-            </ul>
-            <div class="add-form" style="margin-top:10px; gap:5px">
-                <input type="text" id="in-${t.id}" style="flex:1; background:#000; border:1px solid var(--border); color:#fff; padding:4px" placeholder="Имя...">
-                <button onclick="addPlayer(${t.id})" style="background:var(--accent); border:none; padding:0 10px; cursor:pointer">+</button>
+    <main>
+        <section id="news-section">
+            <h2>Latest Match News</h2>
+            <div id="news-container">
+                <p>Loading news...</p>
             </div>
-        </div>`;
-    }).join('');
-}
+        </section>
 
-function checkAdmin() {
-    if (prompt("Пароль:") === ADMIN_PASS) {
-        document.getElementById('page-body').classList.toggle('admin-mode');
-    }
-}
+        <section id="leaderboard-section">
+            <h2>Leaderboard</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Team</th>
+                        <th>W</th>
+                        <th>D</th>
+                        <th>L</th>
+                        <th>Pts</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    </tbody>
+            </table>
+        </section>
+    </main>
 
-async function addPlayer(id) {
-    const inp = document.getElementById('in-' + id);
-    const team = teams.find(t => t.id === id);
-    let pList = team.players ? team.players.split(',') : [];
-    if(inp.value.trim()) {
-        pList.push(inp.value.trim());
-        await savePlayers(id, pList);
-    }
-}
-
-async function removePlayer(id, pi) {
-    const team = teams.find(t => t.id === id);
-    let pList = team.players.split(',');
-    pList.splice(pi, 1);
-    await savePlayers(id, pList);
-}
-
-// Initial Load and Auto-Refresh (Live)
-fetchTeams();
-setInterval(fetchTeams, 5000); 
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
