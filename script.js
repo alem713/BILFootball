@@ -1,31 +1,31 @@
 // EDIT THIS DATA TO UPDATE YOUR SITE
 const newsData = [
-    { title: "Tournament Live!", info: "Matches start this Friday. Be on time!" },
-    { title: "Rules Update", info: "Each half is 15 minutes. No offsides." }
+    { title: "Tournament Live!", info: "Matches start this X. Be on time!" },
+    { title: "Rules Update", info: "Each half is 6 minutes. No offsides. No tackles" }
 ];
 
 const teamData = [
     { 
         name: "ILYAS MATH AGAY", 
-        wins: 3, 
+        wins: 0, 
         draws: 0,
         members: ["Erzat Abi", "Abzal 9A", "Nurarys 10B", "Abilmansur 8B", "Ghani 8B", "Sultanbi 10A", "Ermakhan 8B"] 
     },
     { 
         name: "ERNUR AGAY", 
-        wins: 1, 
+        wins: 0, 
         draws: 0,
         members: ["Nurbek Abi", "Akzhigit", "Ernur 10A", "Nuraly 10A", "Elzhan 9A", "Erbolat 9A", "Adil 8A"] 
     },
     { 
         name: "ARZU AGAY", 
-        wins: 2, 
+        wins: 0, 
         draws: 0,
         members: ["Almat Abi", "Batyrkhan 10B", "Elzhan 8A", "Shyngys 10A", "Bakdaulet 9B", "Adilzhan 9B", "Aidmukhamed 9A"] 
     },
     { 
         name: "DANIYAR FOOTBALL AGAY", 
-        wins: 5, 
+        wins: 0, 
         draws: 0,
         members: ["Rinat Abi", "Bibarys 9A", "Orazaly 9A", "Orynbasarov 10B", "Nuraly E 8A", "Olzhas 10B", "Bekzat 9A"] 
     },
@@ -40,6 +40,18 @@ const teamData = [
         wins: 0, 
         draws: 0,
         members: ["Aidar Abi", "Ersultan 10B", "Arnur 9B", "Aldiyar 9B", "Bekbolat 9B", "Mansur 9B", "Alikhan Talantuly 8A"] 
+    },
+     { 
+        name: "BEKZAT AGAY", 
+        wins: 0, 
+        draws: 0,
+        members: ["Nurbolat Abi", "Erzhan 10A", "Alikhan E 10B", "Eraly 8B", "Alikhan M 8A", "Bekbolat 10B", "Nurmukhamed 8A"] 
+    },
+     { 
+        name: "DANIYAR CHEM AGAY", 
+        wins: 0, 
+        draws: 0,
+        members: ["Erasyl abi", "Bekzhan 10B", "Sultanali 8A", "Nursultan 10A", "Alikhan T 8B", "Zhomart 8B", "Arnur 10A"] 
     }
 ];
 
