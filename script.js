@@ -1,7 +1,7 @@
 // EDIT THIS DATA TO UPDATE YOUR SITE
 const newsData = [
-    { title: "Tournament Live!", info: "Matches start this X. Be on time!" },
-    { title: "Rules Update", info: "Each half is 6 minutes. No offsides. No tackles" }
+    { title: "Tournament Live!", info: "Matches start 20.04.2026. After Etud. Be on time!" },
+    { title: "Rules Update", info: "Each half is 6 minutes. No offsides. Tackles are permitted, but aggressive behaviour is not. Only the captain of a team can argue with the referee." }
 ];
 
 const teamData = [
